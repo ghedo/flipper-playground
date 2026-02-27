@@ -15,6 +15,7 @@ jobs:
     strategy:
       matrix:
         app-dir:
+          - bthome
         sdk-channel:
           - dev
           - release
