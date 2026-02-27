@@ -23,8 +23,9 @@
 #define BTHOME_OBJ_BUTTON    0x3A
 
 // Button event values.
-#define BTHOME_BUTTON_EVENT_NONE  0x00
-#define BTHOME_BUTTON_EVENT_PRESS 0x01
+#define BTHOME_BUTTON_EVENT_NONE       0x00
+#define BTHOME_BUTTON_EVENT_PRESS      0x01
+#define BTHOME_BUTTON_EVENT_LONG_PRESS 0x04
 
 // App values.
 #define APP_LOG_TAG "BTHOME"
@@ -89,7 +90,9 @@ static bool bthome_input_callback(InputEvent *event, void *ctx) {
         }
 
         case InputKeyOk: {
-            if (event->type == InputTypeShort) {
+            if ((event->type == InputTypeShort) ||
+                (event->type == InputTypeLong))
+            {
                 app->beacon_payload[payload_packet_id_value_off] =
                     app->packet_id++;
 
@@ -97,7 +100,9 @@ static bool bthome_input_callback(InputEvent *event, void *ctx) {
                     furi_hal_power_get_pct();
 
                 app->beacon_payload[payload_button_value_off] =
-                    BTHOME_BUTTON_EVENT_PRESS;
+                    event->type == InputTypeShort ?
+                        BTHOME_BUTTON_EVENT_PRESS :
+                        BTHOME_BUTTON_EVENT_LONG_PRESS;
 
                 furi_hal_bt_extra_beacon_set_data(app->beacon_payload,
                         app->beacon_payload_len);
